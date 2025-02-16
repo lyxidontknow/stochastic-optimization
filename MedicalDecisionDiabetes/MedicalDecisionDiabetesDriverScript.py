@@ -38,8 +38,7 @@ if __name__ == "__main__":
     
     # initial parameters
     seed = 19783167
-    print_excel_file=False
-    
+    print_excel_file = False
 
 
     # in order: Metformin, Sensitizer, Secretagoge, Alpha-glucosidase inhibitor, Peptide analog.
@@ -49,9 +48,8 @@ if __name__ == "__main__":
     
     #reading parameter file and initializing variables
     file = 'MDDMparameters.xlsx'
-    S0 = pd.read_excel(file, sheet_name = 'parameters1')
-    additional_params = pd.read_excel(file, sheet_name = 'parameters2')
-    
+    S0 = pd.read_excel(file, sheet_name='parameters1', index_col=0)
+    additional_params = pd.read_excel(file, sheet_name='parameters2', index_col=0)
     
 
     policy_str = additional_params.loc['policy', 0]
@@ -61,15 +59,15 @@ if __name__ == "__main__":
     # each time step is 1 month.
     t_stop = int(additional_params.loc['N', 0]) # number of times we test the drugs
     L = int(additional_params.loc['L', 0]) # number of samples
-    theta_range_1 = np.arange(additional_params.loc['theta_start', 0],\
-                              additional_params.loc['theta_end', 0],\
+    theta_range_1 = np.arange(additional_params.loc['theta_start', 0],
+                              additional_params.loc['theta_end', 0],
                               additional_params.loc['increment', 0])
 
     # dictionaries to store the stats for different values of theta
     theta_obj = {p:[] for p in policy_names}
     theta_obj_std = {p:[] for p in policy_names}
 
-    #data structures to output the algorithm details
+    # data structures to output the algorithm details
     mu_star_labels = [x+"_mu_*" for x in x_names]
     mu_labels = [x+"_mu_bar" for x in x_names]
     sigma_labels = [x+"_sigma_bar" for x in x_names]
@@ -84,7 +82,7 @@ if __name__ == "__main__":
     best_treat_Counter_hist = {(p,theta):[] for p in policy_list for theta in theta_range_1 }
     best_treat_Chosen_hist = {(p,theta):[] for p in policy_list for theta in theta_range_1 }
 
-     # data structures to accumulate the decisions
+    # data structures to accumulate the decisions
     decision_Given_Best_Treat_list = {(p,theta,d):[] for p in policy_list for theta in theta_range_1  for d in x_names}
     decision_Given_Best_Treat_Counter = {(p,theta,d):[] for p in policy_list for theta in theta_range_1  for d in x_names}
     
@@ -111,7 +109,7 @@ if __name__ == "__main__":
         
         
         P_make_decision = getattr(P,policy_chosen)       
-    # loop over theta (theta)
+        # loop over theta (theta)
         policy_start = time.time()
         for theta in theta_range_1:
             Model.prng = np.random.RandomState(seed)
@@ -123,7 +121,7 @@ if __name__ == "__main__":
 
             
             # loop over sample paths
-            for l in range(1,L+1):
+            for l in range(1, L+1):
                 
                 # get a fresh copy of the model
                 model_copy = copy(Model)
@@ -141,7 +139,7 @@ if __name__ == "__main__":
                 
                 # prepare record for output
                 mu_output = [model_copy.mu[x] for x in x_names]
-                record_sample_l =  [policy_chosen, Model.truth_type,theta,l] + mu_output + [best_treatment] 
+                record_sample_l = [policy_chosen, Model.truth_type,theta,l] + mu_output + [best_treatment]
                 
                 
                 
@@ -181,7 +179,7 @@ if __name__ == "__main__":
             
             # updating end of theta stats
             F_hat_mean = np.array(F_hat).mean()
-            F_hat_var = np.sum(np.square(np.array(F_hat) -  F_hat_mean))/(L-1)
+            F_hat_var = np.sum(np.square(np.array(F_hat) - F_hat_mean))/(L-1)
             theta_obj[policy_chosen].append(F_hat_mean)
             theta_obj_std[policy_chosen].append(np.sqrt(F_hat_var/L))
             print("Finishing policy = {}, Truth_type {} and theta = {}. F_bar_mean = {:.3f} and F_bar_std = {:.3f}".format(policy_chosen,Model.truth_type,theta,F_hat_mean,np.sqrt(F_hat_var/L)))
@@ -213,7 +211,7 @@ if __name__ == "__main__":
 
             
          
-         # updating end of policy stats   
+        # updating end of policy stats
         policy_end = time.time()
         print("Ending policy {}. Elapsed time {} secs\n\n\n".format(policy_chosen,policy_end - policy_start))
 
