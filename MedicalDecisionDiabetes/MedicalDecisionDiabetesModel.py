@@ -67,7 +67,7 @@ class MedicalDecisionDiabetesModel():
     
 
     def printTruth(self):
-        print("Model truth_type {}. Meaurement noise sigma_W {} ".format(self.truth_type,self.sigma_w))
+        print("Model truth_type {}. Measurement noise sigma_W {} ".format(self.truth_type,self.sigma_w))
         for x in self.x_names:
             print("Treatment {}: par1 {:.2f}, par2 {:.2f} and par3 {}".format(x,self.truth_params_dict[x][0],self.truth_params_dict[x][1],self.truth_params_dict[x][2]))
         print("\n\n")
@@ -112,8 +112,7 @@ class MedicalDecisionDiabetesModel():
     def transition_fn(self, decision, exog_info):
         # for x = x_n only. Other entries unchanged.
         beta = (getattr(self.state, decision))[1] + exog_info["beta_W"]
-        mu_empirical = ((getattr(self.state, decision))[1]*(getattr(self.state, decision))[0] + \
-        exog_info["beta_W"]*exog_info["reduction"]) / beta
+        mu_empirical = ((getattr(self.state, decision))[1]*(getattr(self.state, decision))[0] + exog_info["beta_W"]*exog_info["reduction"]) / beta
         N_x = getattr(self.state, decision)[2] + 1 # count of no. times drug x was given.
         return {decision: [mu_empirical, beta, N_x]}
     
